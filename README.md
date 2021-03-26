@@ -1,6 +1,6 @@
 # Mobile Ads
 
-A new Flutter project showing an example use case of the new flutter mobile ads. (Except native ads). There is a video [tutorial](ENTER_LINK_HERE) explaining this app.
+A new Flutter project showing an example use case of the new flutter mobile ads. (Except native ads). There is a video [tutorial](https://youtu.be/KyCPhxNTDhU) explaining this app.
 
 - [Youtube](https://www.youtube.com/channel/UCgzDyB6FRT2sNhh0QhB7gtQ)
 - [Instagram](https://www.instagram.com/some.one.who.codez/)
