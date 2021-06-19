@@ -50,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // ),
     // or you can use the different sizes as specified in the documentation. See README for more info.
     request: AdRequest(),
-    listener: AdListener(
+    listener: BannerAdListener(
       onAdFailedToLoad: (ad, error) {
         print('Ad failed with error: $error'); // prints error
         ad.dispose(); // disposes of ad
@@ -64,59 +64,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+
     myBanner.load(); // loads banner ad
-
-    myRewarded = RewardedAd(
-      adUnitId: Platform.isAndroid
-          ? 'ca-app-pub-3940256099942544/5224354917'
-          : 'ca-app-pub-3940256099942544/1712485313', // test ad ids for different platforms
-      request: AdRequest(),
-      listener: AdListener(
-        onAdFailedToLoad: (ad, error) {
-          ad.dispose(); // disposes of ad
-          print('Ad failed with error: $error');
-        },
-        onAdClosed: (ad) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => SecondPage(),
-            ),
-          );
-          ad.dispose(); // disposes of ad
-        },
-        onRewardedAdUserEarnedReward: (RewardedAd ad, RewardItem reward) {
-          print(
-              'You earned: ${reward.amount} ${reward.type}'); // prints reward info
-        },
-      ),
-    ); // create rewarded ad
-
-    myRewarded.load(); // load rewarded ad
-
-    myInterstitial = InterstitialAd(
-      adUnitId: Platform.isAndroid
-          ? 'ca-app-pub-3940256099942544/1033173712'
-          : 'ca-app-pub-3940256099942544/4411468910', // test ad ids for different platforms
-      request: AdRequest(),
-      listener: AdListener(
-        onAdClosed: (ad) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => SecondPage(), // navigate to second page
-            ),
-          );
-          ad.dispose(); // dispose of ad
-        },
-        onAdFailedToLoad: (ad, error) {
-          ad.dispose(); // dispose of ad
-          print('Ad exited with error: $error');
-        },
-      ),
-    );
-
-    myInterstitial.load(); // loads ad before showing
+    _createRewardedAd(); // create rewarded ad
+    _createInterstitialAd(); // create interstitial ad
   }
 
   @override
@@ -148,14 +99,14 @@ class _MyHomePageState extends State<MyHomePage> {
               ElevatedButton(
                 onPressed: () {
                   // show interstitial
-                  myInterstitial.show();
+                  _showInterstitialAd();
                 },
                 child: Text('Interstitial Ad'),
               ),
               ElevatedButton(
                 onPressed: () {
                   // show rewarded ad
-                  myRewarded.show();
+                  _showRewardedAd();
                 },
                 child: Text('Rewarded Ad'),
               ),
@@ -189,6 +140,87 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
+  _showRewardedAd() {
+    myRewarded.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (RewardedAd ad) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SecondPage(),
+          ),
+        );
+        ad.dispose();
+      },
+      onAdFailedToShowFullScreenContent: (RewardedAd ad, AdError error) {
+        print('$ad onAdFailedToShowFullScreenContent: $error');
+        ad.dispose();
+      },
+    );
+
+    myRewarded.show(
+      onUserEarnedReward: (ad, reward) {
+        print('You eanred ${reward.amount} ${reward.type}');
+      },
+    );
+  }
+
+  _showInterstitialAd() {
+    myInterstitial.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (InterstitialAd ad) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SecondPage(),
+          ),
+        );
+        ad.dispose();
+      },
+      onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+        print('$ad onAdFailedToShowFullScreenContent: $error');
+        ad.dispose();
+      },
+    );
+    myInterstitial.show();
+  }
+
+  _createRewardedAd() {
+    RewardedAd.load(
+      adUnitId: Platform.isAndroid
+          ? 'ca-app-pub-3940256099942544/5224354917'
+          : 'ca-app-pub-3940256099942544/1712485313', // test ad ids for different platforms
+      request: AdRequest(),
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
+        onAdFailedToLoad: (LoadAdError error) {
+          print('Ad failed with error: $error');
+        },
+        onAdLoaded: (RewardedAd ad) {
+          setState(() {
+            this.myRewarded = ad;
+          });
+        },
+      ),
+    ); // create rewarded ad
+  }
+
+  _createInterstitialAd(){
+    InterstitialAd.load(
+      adUnitId: Platform.isAndroid
+          ? 'ca-app-pub-3940256099942544/1033173712'
+          : 'ca-app-pub-3940256099942544/4411468910', // test ad ids for different platforms
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdFailedToLoad: (LoadAdError error) {
+          print('Ad exited with error: $error');
+        },
+        onAdLoaded: (InterstitialAd ad) {
+          setState(() {
+            this.myInterstitial = ad;
+          });
+        },
+      ),
+    );
+  }
 }
 
 class SecondPage extends StatefulWidget {
@@ -205,7 +237,7 @@ class _SecondPageState extends State<SecondPage> {
         .banner, // sets 320 x 50 banner size you can set custom banner sizes using:
     // size: AdSize(width: 300, height: 70,)
     request: AdRequest(),
-    listener: AdListener(
+    listener: BannerAdListener(
       onAdFailedToLoad: (ad, error) {
         print('Ad failed with error: $error'); // prints error
         ad.dispose(); // disposes of ad
