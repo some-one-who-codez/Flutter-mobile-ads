@@ -9,7 +9,7 @@ A new Flutter project showing an example use case of the new flutter mobile ads.
 This app loads the first page which has many different buttons to load different ad types. It also has a banner ad which is displayed on both pages.
 
 ## Important!
-The app has not been set up for IOS even though it implements platform specific ad unit ids. For this to work successfully on IOS the `Info.plist` file must be changed to include the `GADApplicationIdentifier` key and the `SKAdNetworkItems` key. See the [documentation](https://pub.dev/packages/google_mobile_ads) for more info.
+The app has not been set up for IOS even though it implements platform specific ad unit ids. For this to work successfully on IOS the `Info.plist` file must be changed to include the `GADApplicationIdentifier` key, Android has its own test AdMob App Id in `android\app\src\main\AndroidManifest.xml`. See the [documentation](https://pub.dev/packages/google_mobile_ads) for more info.
 
 ## Useful Links
 - [AdMob](https://apps.admob.com/signup/create-account)
